@@ -25,7 +25,7 @@ jobs:
     - name: Build the Docker image 
       run: docker build -t jin06/gochat .
     - name: Docker tag image
-      run: docker tag jin06/gochat jin06/gocaht:${{ steps.get_version.outputs.VERSION }}
+      run: docker tag jin06/gochat jin06/gochat:${{ steps.get_version.outputs.VERSION }}
     
     - name: Login hub.docker.com
       run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PASS }}
