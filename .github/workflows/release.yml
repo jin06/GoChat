@@ -7,27 +7,15 @@ on:
 
 jobs:
 
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Get Version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-    - name: Test
-      run: go test -v ./...     
-    - name: Build the Docker image 
-      run: docker build -t jin06/gochat .
-    - name: Docker tag image
-      run: docker tag jin06/gochat jin06/gochat:${{ steps.get_version.outputs.VERSION }}
-    - name: Login hub.docker.com
-      run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PASS }}
-    - name: Push Image (Latest)
-      run: docker push jin06/gochat
-    - name: Push Image (Version)
-      run: docker push jin06/gochat:${{ steps.get_version.outputs.VERSION }}
+    - run: go test -v ./... 
+
     
   docker:
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
