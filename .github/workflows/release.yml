@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
 
@@ -19,4 +19,9 @@ jobs:
       run: go test -v ./...
       
     - name: Build the Docker image 
-      run: docker build . --file Dockerfile --tag jin06/Ubuntu:$(date +%s)
+      run: docker build -t jin06/goChat .
+    
+    - name: Login hub.docker.com
+      run: docker login --username=${{ secrets.DOCKER_HUB_USER }} --password ${{ secrets.DOCKER_HUB_PASS }}
+    - name: Push Image
+      run: docker push jin06/goChat
