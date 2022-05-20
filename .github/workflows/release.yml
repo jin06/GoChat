@@ -3,30 +3,23 @@ name: Release
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 jobs:
 
   release:
-  
     runs-on: ubuntu-latest
-    
     steps:
-    
     - uses: actions/checkout@v3
-    
     - name: Get Version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-    
     - name: Test
-      run: go test -v ./...
-      
+      run: go test -v ./...     
     - name: Build the Docker image 
       run: docker build -t jin06/gochat .
     - name: Docker tag image
       run: docker tag jin06/gochat jin06/gochat:${{ steps.get_version.outputs.VERSION }}
-    
     - name: Login hub.docker.com
       run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PASS }}
     - name: Push Image (Latest)
@@ -34,3 +27,31 @@ jobs:
     - name: Push Image (Version)
       run: docker push jin06/gochat:${{ steps.get_version.outputs.VERSION }}
     
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USER }}
+        password: ${{ secrets.DOCKER_HUB_PASS }}
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: |
+          jin06/gochat
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}        
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}      
