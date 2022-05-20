@@ -32,5 +32,5 @@ jobs:
     - name: Push Image (Latest)
       run: docker push jin06/gochat
     - name: Push Image (Version)
-      run: docker push jin06/gochat:${{ steps.get_version.outputs.VERSITION }}
+      run: docker push jin06/gochat:${{ steps.get_version.outputs.VERSION }}
     
