@@ -15,6 +15,10 @@ jobs:
     
     - uses: actions/checkout@v3
     
+    - name: Get Version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    
     - name: Test
       run: go test -v ./...
       
@@ -24,4 +28,5 @@ jobs:
     - name: Login hub.docker.com
       run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_PASS }}
     - name: Push Image
-      run: docker push jin06/gochat
+      run: docker tag jin06/gochat jin06/gocaht:${{ steps.get_version.OUTPUT.VERSION }} && docker push jin06/gochat && docker push jin06/gochat:${{ steps.get_version.OUTPUT.VERSITION }}
+    
