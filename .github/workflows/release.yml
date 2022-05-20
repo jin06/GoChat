@@ -19,9 +19,9 @@ jobs:
       run: go test -v ./...
       
     - name: Build the Docker image 
-      run: docker build -t jin06/goChat .
+      run: docker build -t jin06/gochat .
     
     - name: Login hub.docker.com
       run: docker login --username=${{ secrets.DOCKER_HUB_USER }} --password ${{ secrets.DOCKER_HUB_PASS }}
     - name: Push Image
-      run: docker push jin06/goChat
+      run: docker push jin06/gochat
