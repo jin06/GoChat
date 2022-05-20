@@ -6,25 +6,25 @@ package main
 
 import (
 	"fmt"
-	"github.com/jin06/GoChat/goChat"
+	"github.com/jin06/GoChat/chat"
 	"net"
 )
 
 //cli用于保存连接到后台的客户端信息
-var Cli goChat.ClientsInfo
+var Cli chat.ClientsInfo
 
 //创建Room列表
-var RoomList []goChat.Room
+var RoomList []chat.Room
 
 //新用户登陆，注册用户列表
-func registe(conn *net.TCPConn) (goChat.Client, error) {
+func registe(conn *net.TCPConn) (chat.Client, error) {
 	//	clientName := make([]byte, 1024)
 	//	conn.Read(clientName)
 
 	//新用户注册到用户列表中
 	clientName := make([]byte, 1024)
 	conn.Read(clientName)
-	client := goChat.NewClient(string(clientName), conn, RoomList[0])
+	client := chat.NewClient(string(clientName), conn, RoomList[0])
 	err := Cli.AddClient(string(clientName), client)
 	if err != nil {
 		fmt.Println("注册失败")
@@ -42,10 +42,10 @@ func registe(conn *net.TCPConn) (goChat.Client, error) {
 	return client, err
 }
 
-func serverChat(client goChat.Client) {
+func serverChat(client chat.Client) {
 	conn := client.Conn
 	msg := make([]byte, 1024)
-	command := goChat.Command{conn, "", &Cli, RoomList, &client}
+	command := chat.Command{conn, "", &Cli, RoomList, &client}
 	defer delete(Cli.Clients, client.Name)
 	defer client.Rom.RemoveClient(client)
 	for {
@@ -80,10 +80,10 @@ func main() {
 	checkErr(err)
 
 	//初始化cli
-	Cli = goChat.ClientsInfo{make(map[string]goChat.Client)}
+	Cli = chat.ClientsInfo{make(map[string]chat.Client)}
 
 	//建立默认聊天室,并初始化
-	RoomList = []goChat.Room{goChat.NewRoom(1, "大厅聊天室"), goChat.NewRoom(2, "二号聊天室"), goChat.NewRoom(3, "三号聊天室")}
+	RoomList = []chat.Room{chat.NewRoom(1, "大厅聊天室"), chat.NewRoom(2, "二号聊天室"), chat.NewRoom(3, "三号聊天室")}
 	go RoomList[0].Start()
 	go RoomList[1].Start()
 	go RoomList[2].Start()
